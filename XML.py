@@ -82,15 +82,14 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
     for feature in features:
         
         # find position of current feature
-        position = None
+        single_position = 0
         position_feat = feature.find('.//ns:position', namespace)
         if position_feat is not None:
             position = int(position_feat.get('position'))
+            single_position = 1
         else:
-            position1 = int(feature.find('.//ns:begin', namespace).get('position'))
+            position = int(feature.find('.//ns:begin', namespace).get('position'))
             position2 = int(feature.find('.//ns:end', namespace).get('position'))
-            if position1 == position2:
-                position = position1
 
         # find variant
         variant = feature.find('.//ns:variant', namespace)
@@ -109,6 +108,9 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
         if mutated is not None:
             if mutated.text == '*':
                 stop_gained = 1
+            elif mutated.text == '?' and position == 1:
+                print(f'Variant at position {position}: Start codon defective. Skipped.')
+                continue
 
         # decide what to do based on consequenceType
         if conseq == 'missense' and stop_gained == 0: # some inframe deletions are wrongfly annotated as missense (extra variable stop_gained to check)
@@ -130,7 +132,7 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
             for varloc in varlocs:
                 loc = varloc.get('loc')
                 if 'dup' in loc:
-                    if position is not None:
+                    if single_position == 1:
                         # insert wildtype again
                         seq_new = list(sequence)
                         seq_new.insert(position, wildtype)
@@ -142,9 +144,9 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
                         seq_new = list(sequence)
                         desc = ''
                         for i, wt in enumerate(wildtypes):
-                            seq_new.insert(position1+i+len(wildtypes)-1, wt)
+                            seq_new.insert(position+i+len(wildtypes)-1, wt)
                             # define description for fasta header
-                            desc = desc + f'{wt}{position1+i}_'
+                            desc = desc + f'{wt}{position+i}_'
                         desc = desc[:-1] + 'dup'
                     break
                 else:
@@ -154,7 +156,7 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
                 print(f'Variant at position {position}: Unknown insertion. Skipped.')
                 continue
         elif conseq == 'inframe deletion':
-            if position is not None:
+            if single_position == 1:
                 # remove current amino acid
                 seq_new = list(sequence)
                 seq_new.pop(position-1)
@@ -165,7 +167,7 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
                 wildtypes = list(wildtype)
                 seq_new = list(sequence)
                 desc = ''
-                for i, pos in enumerate(np.arange(position1, position2+1)):
+                for i, pos in enumerate(np.arange(position, position2+1)):
                     seq_new.pop(pos-1-i) # -i because sequence get 1 shorter with every iteration
                     # define description for fasta header
                     desc = desc + f'{wildtypes[i]}{pos}_'
