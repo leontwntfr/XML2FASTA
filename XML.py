@@ -39,7 +39,7 @@ import numpy as np
     # save as fasta
 
 
-def fasta_from_variantsXML(filepath, CDS = None):
+def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
 
     # evidence level dict (UniProt)
     ev_dict = {'Evidence at protein level': 1, 'Evidence at transcript level': 2, 'Inferred from homology': 3, 'Predicted': 4, 'Uncertain': 5}
@@ -65,6 +65,15 @@ def fasta_from_variantsXML(filepath, CDS = None):
     sequence_version = root.find('ns:sequence', namespace).get('version')
     taxid = root.find('ns:taxid', namespace).text
     organism = root.find('ns:organismName', namespace).text
+
+    # database based on review status
+    if reviewed == True:
+        dbase = 'sp'
+    else:
+        dbase = 'tr'
+
+    # add original sequence in beginning
+    fasta_seqs.append(SeqRecord(Seq(sequence), id= f'{dbase}|{accession}|{name}', description= f'{protname} OS={organism} OX={taxid} GN={genename} PE={protein_existence} SV={sequence_version}'))
 
     # find all features (one feature per variant), later one sequence per feature
     features = root.findall('.//ns:feature', namespace)
@@ -180,7 +189,7 @@ def fasta_from_variantsXML(filepath, CDS = None):
         fasta_seqs.append(SeqRecord(Seq(''.join(seq_new)), id= f've|{accession}_{desc}|{name}', description= f'{protname} OS={organism} OX={taxid} GN={genename} PE={protein_existence} SV={sequence_version}'))
 
     # write variant sequences to fasta
-    with open(f'{accession}_{protname}_variants.fasta', 'w') as output:
+    with open(f'{outdir}/{accession}_{protname}_variants.fasta', 'w') as output:
         SeqIO.write(fasta_seqs, output, 'fasta')
 
     print('Fasta file of variants successfully created.')
@@ -189,5 +198,5 @@ def fasta_from_variantsXML(filepath, CDS = None):
 
 
 
-fasta_from_variantsXML('../Data/P02766.xml')
+fasta_from_variantsXML('../Data/test/A1L190.xml', '../fastaOUT')
 
