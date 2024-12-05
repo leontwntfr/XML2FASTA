@@ -54,8 +54,18 @@ I talked to Christian about the file I sent and the general project. The script 
 - the original sequence of the protein should be included at position 1 in the generated fasta
 - more consequenceTypes should be added based on tests done with other XML files
 - improve user-friendliness (so that the script is easily usable by all people in the group)
-- advanced: implement functionality to iterated through database of many different proteins, download associated variants XML automatically, and create variant fasta for each
+- advanced: implement functionality to iterate through database of many different proteins, download associated variants XML automatically, and create variant fasta for each
 
 Today, I already added that now the original sequence will also be in the generated fasta (with right database at start, sp or tr, based on review argument). I also added the possibility to provide an output directory as argument.
 
 Further, I tested some other XMLs to search for more consequenceTypes or weird behavior. Based on one file, I added the abiliy to recognize defect start codons (variant is skipped). I now downloaded the longest protein (curated) there is in humans (Q8WZ42, Titin) and ran the function for it. Many "Unknown consequenceType" messages were printed. I can go through each one of them (by breakpoint) on the next day to add the ability to recognize these missing consequenceTypes.
+
+----------------------------
+
+### December 5, 2024
+
+After testing several different variant XMLs from UniProt entries, I implemented the recognition and handling of two more consequenceTypes:
+- **"-"** (apparently translates to delins variants): indicated amino acid(s) are deleted and the indicated new amino acids are inserted at the same postion
+- **"stop retained"**: no change in amino acid sequence occurs (only prints message that variant is present)
+
+For now, I prevented the message "Frameshift variant cannot be processed. No CDS provided." from being printed to avoid confusion of the function being able to handle frameshifts in the first place. Instead, a new message appears that just informs about a framshift variant at the respective position.
