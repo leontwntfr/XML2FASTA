@@ -174,15 +174,50 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
                 desc = desc[:-1] + 'del'
         elif conseq == 'frameshift':
             # check if nucleotide sequence provided (CDS)
+            print(f'Variant at position {position}: Frameshift variant. Skipped')
+            continue
             if CDS:
-                print(f'Variant at position {position}: Frameshifts no implemented yet. Skipped.')
+                print(f'Variant at position {position}: Frameshifts not implemented yet. Skipped.')
                 continue
             else:
                 print(f'Variant at position {position}: Frameshift variant cannot be processed. No CDS provided. Skipped.')  
                 continue      
+        elif conseq == '-':
+            # check variantLocation
+            varlocs = variant.findall('.//ns:variantLocation', namespace)
+            # iterate through varloc
+            for varloc in varlocs:
+                loc = varloc.get('loc')
+                if 'delin' in loc:
+                    if single_position == 1:
+                        # delete wildtype, insert mutatedType starting at same position
+                        seq_new = list(sequence)
+                        seq_new.pop(position-1)
+                        mutated_ins = list(mutated.text)
+                        for i, mt in enumerate(mutated_ins):
+                            seq_new.insert(position+i-1, mt)
+                        # define description for fasta header
+                        desc = f'{wildtype}{position}delins{mutated.text}'
+                    else:
+                        # delete all wildtype, insert mutatedType starting at beginning position
+                        seq_new = list(sequence)
+                        del seq_new[position-1:position2]
+                        mutated_ins = list(mutated.text)
+                        for i, mt in enumerate(mutated_ins):
+                            seq_new.insert(position+i-1, mt)
+                        desc = f'{wildtype[0]}{position}_{wildtype[-1]}{position2}delins{mutated.text}'
+                    break
+                else:
+                    continue
+            # if no new sequence was generated
+            if not seq_new:
+                print(f'Variant at position {position}: Type of special variant unknown (consequenceType = "-"). Skipped.')
+                continue
         elif conseq == 'stop lost':
             print(f'Variant at position {position}: Stop lost variant. Skipped.')
             continue
+        elif conseq == 'stop retained':
+            print(f'Variant at position {position}: Stop retained. No change to amino acid sequence. Skipped')
         else:
             print(f'Variant at position {position}: Unknown consequenceType. Skipped.')
             continue
@@ -194,11 +229,11 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
     with open(f'{outdir}/{accession}_{protname}_variants.fasta', 'w') as output:
         SeqIO.write(fasta_seqs, output, 'fasta')
 
-    print('Fasta file of variants successfully created.')
+    print('> Fasta file of variants successfully created.')
 
     return
 
 
 
-fasta_from_variantsXML('../Data/test/A1L190.xml', '../fastaOUT')
+fasta_from_variantsXML('../Data/test/Q8NF91.xml', '../fastaOUT')
 
