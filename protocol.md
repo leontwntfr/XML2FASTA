@@ -69,3 +69,19 @@ After testing several different variant XMLs from UniProt entries, I implemented
 - **"stop retained"**: no change in amino acid sequence occurs (only prints message that variant is present)
 
 For now, I prevented the message "Frameshift variant cannot be processed. No CDS provided." from being printed to avoid confusion of the function being able to handle frameshifts in the first place. Instead, a new message appears that just informs about a framshift variant at the respective position.
+
+----------------------------
+
+### December 17, 2024
+
+***Aim: Make script more user-friendly.***
+
+I started implementing a GUI using the Python-included package **Tkinter**. This package allows for a simple, easy to use GUI to select files and submit, and is also functioning across platforms. I set up the template of the GUI implementation and will continue modifying it to the needs of the script on the next day.
+
+----------------------------
+
+### December 18, 2024
+
+I modified and added to the Tkinter implementation based on the needs of the script. For example, I modified the displayed names, wanted input file type, and set a standard path for the output directory being the current working directory. This concludes the work on user-friendliness for now (if needed, more will be added).
+
+Next, I should work on an implementation to accept normal XML files (not variant XML files, and also allowing multiple entries), and automatic search for each variant XML file to process and generate a fasta.
