@@ -233,7 +233,65 @@ def fasta_from_variantsXML(filepath, outdir = '.', CDS = None, reviewed = True):
 
     return
 
+###########################################################
+###---------------------- TKINTER ----------------------###
+###########################################################
 
+import tkinter as tk
+import os
+from tkinter import filedialog, messagebox, ttk
 
-fasta_from_variantsXML('../Data/test/Q8NF91.xml', '../fastaOUT')
+def browse_input_file():
+    file_path = filedialog.askopenfilename(title= "Select Input XML File", filetypes= [("XML files", "*.xml")])
+    if file_path:
+        input_entry.delete(0, tk.END)
+        input_entry.insert(0, file_path)
 
+def browse_output_folder():
+    folder_path = filedialog.askdirectory(title= "Select Output Folder", initialdir= '.', mustexist= True)
+    if folder_path:
+        output_entry.delete(0, tk.END)
+        output_entry.insert(0, folder_path)
+
+def submit():
+    input_file = input_entry.get()
+    output_folder = output_entry.get()
+    if not input_file or not output_folder:
+        messagebox.showerror("Error", "Both input file and output folder must be set.")
+        return
+    # Process function
+    fasta_from_variantsXML(input_file, output_folder)
+
+### main window
+root = tk.Tk()
+root.title("XML2FASTA")
+root.geometry("600x200")  # window size
+
+### select input file
+ttk.Label(root, text="Input XML File:").pack(pady= (10, 0))
+input_frame = ttk.Frame(root)
+input_frame.pack(fill= "x", padx= 10)
+input_entry = ttk.Entry(input_frame)
+input_entry.pack(side= "left", expand= True, fill= "x")
+# set initial file input (here *xml)
+input_entry.insert(0, os.path.abspath(os.getcwd()) + "/*.xml")
+# browse button
+ttk.Button(input_frame, text= "Browse", command= browse_input_file).pack(side= "right")
+
+### select output folder
+ttk.Label(root, text= "Output Folder:").pack(pady=(10, 0))
+output_frame = ttk.Frame(root)
+output_frame.pack(fill= "x", padx= 10)
+output_entry = ttk.Entry(output_frame)
+output_entry.pack(side= "left", expand= True, fill= "x")
+# set initial folder (here)
+output_entry.insert(0, os.path.abspath(os.getcwd())) # current working directory
+# browse button
+ttk.Button(output_frame, text= "Browse", command= browse_output_folder).pack(side= "right")
+
+### submit button
+submit_button = ttk.Button(root, text= "Submit", command= submit)
+submit_button.pack(pady= 20)
+
+### run script
+root.mainloop()
