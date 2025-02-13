@@ -85,3 +85,34 @@ I started implementing a GUI using the Python-included package **Tkinter**. This
 I modified and added to the Tkinter implementation based on the needs of the script. For example, I modified the displayed names, wanted input file type, and set a standard path for the output directory being the current working directory. This concludes the work on user-friendliness for now (if needed, more will be added).
 
 Next, I should work on an implementation to accept normal XML files (not variant XML files, and also allowing multiple entries), and automatic search for each variant XML file to process and generate a fasta.
+
+----------------------------
+
+### February 12, 2025
+
+***Aim: Implement accepting normal XML files and running for all entries***
+
+- added recognition of XML file type
+- added download of variant XML file function
+- implemented allowing multiple file selection (in Tkinter) and processing (works with variant XML files)
+- started implementing processing of normal XML files in general
+
+Next time:
+- finish normal XML files handling
+- fix Tkinter window not closing when pressing submit
+- fix only allowing one time browse of input files in Tkinter
+
+----------------------------
+
+### February 13, 2025
+
+***Aim: Release first version able to handle multiple and normal UniProt XML files***
+
+- finished implementation of multiple and normal XML file handling
+- modified Tkinter GUI for user-friendliness:
+    - fixed issue of one time browse of input files
+    - added console window and redirected print commands to it in real-time using threading
+    - added close button
+- modified and added several print messages
+
+This concludes the first version of FASTA2XML.
