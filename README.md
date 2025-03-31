@@ -34,7 +34,7 @@ python XML.py
 
 ## Usage
 
-The tool provides an user interface where input files (multiple are possible) and an output firectory can be selected. The following input files are allowed:
+The tool provides an user interface where input files (multiple are possible) and an output directory can be selected. The following input files are allowed:
 - EBL variant XML files (e.g. obtained from UniProt variant viewer)
 - UniProt entry XML files (also including multiple entries)
 
